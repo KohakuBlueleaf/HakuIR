@@ -78,6 +78,7 @@ class ImageRestoration:
         self,
         img: Image.Image, 
         scale = 2, 
+        batch_size = 4,
         device = 'cuda', 
         dtype = torch.float16
     ) -> Image.Image:
@@ -94,7 +95,7 @@ class ImageRestoration:
         upscale = upscale.unsqueeze(0).to(device=device, dtype=dtype)
         
         with torch.autocast(device, dtype):
-            output: torch.Tensor = self.restoration(upscale)
+            output: torch.Tensor = self.restoration(upscale, batch_size)
         output = output.squeeze(0).permute(1, 2, 0).float().cpu()
         output = torch.clamp(output, 0, 1)
         output = (output*255).numpy().astype(np.uint8)
@@ -106,7 +107,8 @@ class ImageRestoration:
     def upscale_after_ir(
         self,
         img: Image.Image, 
-        scale = 2, 
+        scale = 2,
+        batch_size = 4,
         device = 'cuda', 
         dtype = torch.float16
     ) -> Image.Image:
@@ -118,7 +120,7 @@ class ImageRestoration:
         img = img.unsqueeze(0).to(device=device, dtype=dtype)
         
         with torch.autocast(device, dtype):
-            output: torch.Tensor = self.restoration(img)
+            output: torch.Tensor = self.restoration(img, batch_size)
         output = output.squeeze(0).permute(1, 2, 0).float().cpu()
         output = torch.clamp(output, 0, 1)
         output = (output*255).numpy().astype(np.uint8)
