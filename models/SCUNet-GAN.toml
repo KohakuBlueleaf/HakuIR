@@ -1,0 +1,9 @@
+[network]
+type = 'SCUNet'
+class = 'scunet.SCUNet'
+
+[network.configs]
+in_nc = 3
+config = [4,4,4,4,4,4,4]
+dim = 64
+input_resolution = 256

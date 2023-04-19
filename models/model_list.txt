@@ -1,0 +1,19 @@
+NAFNet:
+download from the original repo:
+https://github.com/megvii-research/NAFNet/#results-and-pre-trained-models
+
+put them in this folder
+
+
+SCUNet:
+download from the KAIR repo:
+https://github.com/cszn/KAIR/releases
+(under model zoo, choose scunet_color_real_gan and scunet_color_real_psnr)
+
+And them rename them to the name of SCUNet-GAN or SCUNet-PSNR.
+
+
+Others:
+If you have other models that want to use in this script,
+make sure you have the code of that model (you can refer to the nafnet/scunet folder)
+And them write config files for them.
