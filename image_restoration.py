@@ -1,6 +1,7 @@
 import os
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:256'
 
+import math
 import toml
 from tqdm import tqdm
 
@@ -32,7 +33,7 @@ class ImageRestoration:
         self.model = net
     
     @torch.no_grad()
-    def restoration(self, img: torch.Tensor):
+    def restoration(self, img: torch.Tensor, batch_size = 4):
         # test the image tile by tile
         b, c, h, w = img.size()
         tile = min(self.tile_size, h, w)
@@ -43,21 +44,32 @@ class ImageRestoration:
         E = torch.zeros(b, c, h, w, dtype=img.dtype, device=img.device).type_as(img)
         W = torch.zeros_like(E, dtype=img.dtype, device=img.device)
         
-        with tqdm(total=len(h_idx_list) * len(w_idx_list), desc="IR tiles") as pbar:
+        all_patch = []
+        all_idx = []
+        
+        with tqdm(total=math.ceil(len(h_idx_list)*len(w_idx_list)/batch_size), desc="IR tiles") as pbar:
             for h_idx in h_idx_list:
                 for w_idx in w_idx_list:
                     in_patch = img[..., h_idx: h_idx + tile, w_idx: w_idx + tile]
-                    out_patch = self.model(in_patch)
-                    out_patch_mask = torch.ones_like(out_patch)
-                    E[
-                    ..., h_idx: (h_idx + tile), w_idx: (w_idx + tile)
-                    ].add_(out_patch)
-                    W[
-                    ..., h_idx: (h_idx + tile), w_idx: (w_idx + tile)
-                    ].add_(out_patch_mask)
-                    pbar.update(1)
-                    mem_usage = torch.cuda.memory_allocated()/1e6
-                    pbar.set_postfix({'mem': f'{mem_usage:.1f}MB'})
+                    all_patch.append(in_patch)
+                    all_idx.append((h_idx, w_idx))
+            for i in range(0, len(all_patch), batch_size):
+                out_patch = self.model(torch.cat(all_patch[i:i+batch_size]))
+                for idx, (h_idx, w_idx) in enumerate(all_idx[i:i+batch_size]):
+                    all_patch[i+idx] = (h_idx, w_idx, out_patch[idx])
+                pbar.update(1)
+                mem_usage = torch.cuda.memory_allocated()/1e6
+                pbar.set_postfix({'mem': f'{mem_usage:.1f}MB'})
+        
+        for h_idx, w_idx, out_patch in tqdm(all_patch, desc="Rebuild tiles"):
+            out_patch_mask = torch.ones_like(out_patch)
+            E[
+            ..., h_idx: (h_idx + tile), w_idx: (w_idx + tile)
+            ].add_(out_patch)
+            W[
+            ..., h_idx: (h_idx + tile), w_idx: (w_idx + tile)
+            ].add_(out_patch_mask)
+        
         output = E.div_(W)
         return output
     
