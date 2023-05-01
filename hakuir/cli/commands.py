@@ -63,9 +63,16 @@ def upscale_cli(args):
             path = os.path.join(folder, file)
             if os.path.isfile(path):
                 input_list.append(path)
-                output_list.append(os.path.join(args.output,file))
+                if args.output == "" or args.output == None:
+                    output_list.append(os.path.splitext(path)[0]+"_upscaled.png")
+                elif os.path.isdir(args.output):
+                    output_list.append(os.path.join(args.output,file))
     else:
         input_list.append(args.input)
+        if args.output == "" or args.output == None:
+            output_list.append(os.path.splitext(args.input)[0]+"_upscaled.png")
+        elif os.path.isdir(args.output):
+            output_list.append(os.path.join(args.output,os.path.basename(args.input)))
 
     logging.info("WorkList: Start")
     logging.info("WorkList: {}/{}".format(0,len(input_list)))
@@ -90,9 +97,16 @@ def upscale_before_ir_cli(args):
             path = os.path.join(folder, file)
             if os.path.isfile(path):
                 input_list.append(path)
-                output_list.append(os.path.join(args.output,file))
+                if args.output == "" or args.output == None:
+                    output_list.append(os.path.splitext(path)[0]+"_upscaled.png")
+                elif os.path.isdir(args.output):
+                    output_list.append(os.path.join(args.output,file))
     else:
         input_list.append(args.input)
+        if args.output == "" or args.output == None:
+            output_list.append(os.path.splitext(args.input)[0]+"_upscaled.png")
+        elif os.path.isdir(args.output):
+            output_list.append(os.path.join(args.output,os.path.basename(args.input)))
 
     logging.info("WorkList: Start")
     logging.info("WorkList: {}/{}".format(0,len(input_list)))    
@@ -115,9 +129,16 @@ def upscale_after_ir_cli(args):
             path = os.path.join(folder, file)
             if os.path.isfile(path):
                 input_list.append(path)
-                output_list.append(os.path.join(args.output,file))
+                if args.output == "" or args.output == None:
+                    output_list.append(os.path.splitext(path)[0]+"_upscaled.png")
+                elif os.path.isdir(args.output):
+                    output_list.append(os.path.join(args.output,file))
     else:
         input_list.append(args.input)
+        if args.output == "" or args.output == None:
+            output_list.append(os.path.splitext(args.input)[0]+"_upscaled.png")
+        elif os.path.isdir(args.output):
+            output_list.append(os.path.join(args.output,os.path.basename(args.input)))
 
     logging.info("WorkList: Start")
     logging.info("WorkList: {}/{}".format(0,len(input_list)))
