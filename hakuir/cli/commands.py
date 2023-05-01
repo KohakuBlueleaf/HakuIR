@@ -5,6 +5,8 @@ import os
 import logging
 from PIL import Image
 
+logging.basicConfig(level = logging.INFO)
+
 def available_model_list(args):
     folder = './models'
     model_list = []
@@ -41,7 +43,7 @@ def upscale_before_ir(input_image:Image,model_name:str):
     return output
 
 def upscale_after_ir(input_image:Image,model_name:str):
-    from image_restoration import ImageRestoration
+    from hakuir.image_restoration import ImageRestoration
 
     model = ImageRestoration()
     model.load_model(model_name)
@@ -52,37 +54,78 @@ def upscale_after_ir(input_image:Image,model_name:str):
     return output
 
 def upscale_cli(args):
-    if os.path.isdir(args.input):  
-        logging.ERROR("Path is a directory")
-        return
+    input_list = []
+    output_list = []
+    if os.path.isdir(args.input):
+        logging.debug("Path is a directory")
+        folder = args.input
+        for file in os.listdir(folder):
+            path = os.path.join(folder, file)
+            if os.path.isfile(path):
+                input_list.append(path)
+                output_list.append(os.path.join(args.output,file))
+    else:
+        input_list.append(args.input)
 
-    input_img = Image.open(args.input).convert('RGB')
-
-    if args.resample == "lanczos":  
-        resample = Image.LANCZOS
-
-    logging.info("Input image loaded from {}".format(args.input))
-    upscale_img = upscale(input_img,resample)
-    upscale_img.save(args.output)
-    logging.info("Upscale image saved as {}".format(args.output))
+    logging.info("WorkList: Start")
+    logging.info("WorkList: {}/{}".format(0,len(input_list)))
+    for i in range(len(input_list)):
+        input_img = Image.open(input_list[i]).convert('RGB')
+        if args.resample == "lanczos":  
+            resample = Image.LANCZOS
+        logging.info("Input image loaded from {}".format(input_list[i]))
+        upscale_img = upscale(input_img,resample)
+        upscale_img.save(output_list[i])
+        logging.info("Upscale image saved as {}".format(output_list[i]))
+        logging.info("WorkList: {}/{}".format(i+1,len(input_list)))
+    logging.info("WorkList: Done")
 
 def upscale_before_ir_cli(args):
+    input_list = []
+    output_list = []
     if os.path.isdir(args.input):
-        logging.ERROR("Path is a directory")
-        return
-    
-    logging.info("Input image loaded from {}".format(args.input))
-    input_img = Image.open(args.input).convert('RGB')
-    output = upscale_before_ir(input_img,args.model)
-    output.save(args.output)
-    logging.info("Upscale image saved as {}".format(args.output))
+        logging.debug("Path is a directory")
+        folder = args.input
+        for file in os.listdir(folder):
+            path = os.path.join(folder, file)
+            if os.path.isfile(path):
+                input_list.append(path)
+                output_list.append(os.path.join(args.output,file))
+    else:
+        input_list.append(args.input)
+
+    logging.info("WorkList: Start")
+    logging.info("WorkList: {}/{}".format(0,len(input_list)))    
+    for i in range(len(input_list)):
+        logging.info("Input image loaded from {}".format(input_list[i]))
+        input_img = Image.open(input_list[i]).convert('RGB')
+        output = upscale_before_ir(input_img,args.model)
+        output.save(output_list[i])
+        logging.info("Upscale image saved as {}".format(output_list[i]))
+        logging.info("WorkList: {}/{}".format(i+1,len(input_list)))
+    logging.info("WorkList: Done")
 
 def upscale_after_ir_cli(args):
+    input_list = []
+    output_list = []
     if os.path.isdir(args.input):
-        logging.ERROR("Path is a directory")
-        return
-    logging.info("Input image loaded from {}".format(args.input))
-    input_img = Image.open(args.input).convert('RGB')
-    output = upscale_after_ir(input_img,args.model)
-    output.save(args.output)
-    logging.info("Upscale image saved as {}".format(args.output))
+        logging.debug("Path is a directory")
+        folder = args.input
+        for file in os.listdir(folder):
+            path = os.path.join(folder, file)
+            if os.path.isfile(path):
+                input_list.append(path)
+                output_list.append(os.path.join(args.output,file))
+    else:
+        input_list.append(args.input)
+
+    logging.info("WorkList: Start")
+    logging.info("WorkList: {}/{}".format(0,len(input_list)))
+    for i in range(len(input_list)):
+        logging.info("Input image loaded from {}".format(input_list[i]))
+        input_img = Image.open(input_list[i]).convert('RGB')
+        output = upscale_after_ir(input_img,args.model)
+        output.save(output_list[i])
+        logging.info("Upscale image saved as {}".format(output_list[i]))
+        logging.info("WorkList: {}/{}".format(i+1,len(input_list)))
+    logging.info("WorkList: Done")
