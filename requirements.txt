@@ -5,3 +5,4 @@ numpy
 einops
 thop
 timm
+toml
