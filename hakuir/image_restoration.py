@@ -33,7 +33,7 @@ class ImageRestoration:
         self.model = net
     
     @torch.no_grad()
-    def restoration(self, img: torch.Tensor, batch_size = 4):
+    def _restoration(self, img: torch.Tensor, batch_size = 4):
         # test the image tile by tile
         b, c, h, w = img.size()
         tile = min(self.tile_size, h, w)
@@ -74,6 +74,17 @@ class ImageRestoration:
         return output
     
     @torch.no_grad()
+    def restoration(self,img: Image.Image, batch_size = 4,device = 'cuda', dtype = torch.float16)->Image.Image:
+        img = ToTensor()(img)
+        img = img.unsqueeze(0).cuda().half()
+        with torch.autocast(device, dtype):
+            output: torch.Tensor = self._restoration(img, batch_size)
+        output = output.squeeze(0).permute(1, 2, 0).float().cpu()
+        output = torch.clamp(output, 0, 1)
+        output = (output*255).numpy().astype(np.uint8)
+        output: Image.Image = Image.fromarray(output)
+        return output
+
     def upscale_before_ir(
         self,
         img: Image.Image, 
@@ -91,19 +102,11 @@ class ImageRestoration:
             target_size,
             resample=Image.LANCZOS
         )
-        upscale = ToTensor()(upscale)
-        upscale = upscale.unsqueeze(0).to(device=device, dtype=dtype)
-        
-        with torch.autocast(device, dtype):
-            output: torch.Tensor = self.restoration(upscale, batch_size)
-        output = output.squeeze(0).permute(1, 2, 0).float().cpu()
-        output = torch.clamp(output, 0, 1)
-        output = (output*255).numpy().astype(np.uint8)
-        output: Image.Image = Image.fromarray(output)
+
+        output = self.restoration(upscale, batch_size, device, dtype)
         
         return output
-    
-    @torch.no_grad()
+
     def upscale_after_ir(
         self,
         img: Image.Image, 
@@ -116,16 +119,9 @@ class ImageRestoration:
             int(img.size[0]*scale),
             int(img.size[1]*scale)
         )
-        img = ToTensor()(img)
-        img = img.unsqueeze(0).to(device=device, dtype=dtype)
         
-        with torch.autocast(device, dtype):
-            output: torch.Tensor = self.restoration(img, batch_size)
-        output = output.squeeze(0).permute(1, 2, 0).float().cpu()
-        output = torch.clamp(output, 0, 1)
-        output = (output*255).numpy().astype(np.uint8)
-        output: Image.Image = Image.fromarray(output)
-        
+        output = self.restoration(img, batch_size, device, dtype)
+
         output = output.resize(
             target_size,
             resample=Image.LANCZOS

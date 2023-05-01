@@ -1,6 +1,6 @@
 import argparse
 import os
-from .commands import available_model_list, upscale_cli, upscale_before_ir_cli, upscale_after_ir_cli
+from .commands import available_model_list, upscale_cli, restoration_cli , upscale_before_ir_cli, upscale_after_ir_cli
 
 def cli():
     parser = argparse.ArgumentParser(description="HAKUIR")
@@ -15,14 +15,20 @@ def cli():
     upscaleCommand.add_argument("-o","--output",type=str, help="output image path")
     upscaleCommand.set_defaults(handle=upscale_cli)
 
-    upscaleBeforeIRCommand = subparsers.add_parser("upscale-before-ir", help="Upscale before IR")
-    upscaleBeforeIRCommand.add_argument("-m","--model",type=str,help="Restoration Model. Use models command to see available models")
+    restorationCommand = subparsers.add_parser("restoration", help="Just restoration")
+    restorationCommand.add_argument("-m","--model",default="NAFNet-REDS-width64",type=str,help="Restoration Model. Use 'hakuir models' command to see available models")
+    restorationCommand.add_argument("-i","--input",type=str,required=True, help="input image path")
+    restorationCommand.add_argument("-o","--output",type=str, help="output image path")
+    restorationCommand.set_defaults(handle=restoration_cli)
+
+    upscaleBeforeIRCommand = subparsers.add_parser("upscale-before-ir", help="Upscale before restoration")
+    upscaleBeforeIRCommand.add_argument("-m","--model",default="NAFNet-REDS-width64",type=str,help="Restoration Model. Use 'hakuir models' command to see available models")
     upscaleBeforeIRCommand.add_argument("-i","--input",type=str,required=True, help="input image path")
     upscaleBeforeIRCommand.add_argument("-o","--output",type=str, help="output image path")
     upscaleBeforeIRCommand.set_defaults(handle=upscale_before_ir_cli)
 
-    upscaleAfterIRCommand = subparsers.add_parser("upscale-after-ir", help="Upscale after IR")
-    upscaleAfterIRCommand.add_argument("-m","--model",type=str,help="Restoration Model. Use models command to see available models")
+    upscaleAfterIRCommand = subparsers.add_parser("upscale-after-ir", help="Upscale after restoration")
+    upscaleAfterIRCommand.add_argument("-m","--model",default="NAFNet-REDS-width64",type=str,help="Restoration Model. Use 'hakuir models' command to see available models")
     upscaleAfterIRCommand.add_argument("-i","--input",type=str,required=True, help="input image path")
     upscaleAfterIRCommand.add_argument("-o","--output",type=str, help="output image path")
     upscaleAfterIRCommand.set_defaults(handle=upscale_after_ir_cli)
