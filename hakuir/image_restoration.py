@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from torchvision.transforms import ToTensor
 
-from utils import instantiate
+from hakuir.utils import instantiate
 
 
 class ImageRestoration:

@@ -30,7 +30,7 @@ def upscale(input_image:Image,resample:Image.Resampling):
     return upscale_img
 
 def upscale_before_ir(input_image:Image,model_name:str):
-    from image_restoration import ImageRestoration
+    from hakuir.image_restoration import ImageRestoration
 
     model = ImageRestoration()
     model.load_model(model_name)
