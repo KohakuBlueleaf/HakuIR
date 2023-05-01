@@ -1,3 +1,5 @@
+import sys 
+sys.path.append("..")
 import argparse
 import os
 import logging
@@ -71,7 +73,7 @@ def upscale_before_ir_cli(args):
     
     logging.info("Input image loaded from {}".format(args.input))
     input_img = Image.open(args.input).convert('RGB')
-    output = model.upscale_before_ir(input_img,args.model)
+    output = upscale_before_ir(input_img,args.model)
     output.save(args.output)
     logging.info("Upscale image saved as {}".format(args.output))
 
@@ -81,6 +83,6 @@ def upscale_after_ir_cli(args):
         return
     logging.info("Input image loaded from {}".format(args.input))
     input_img = Image.open(args.input).convert('RGB')
-    output = model.upscale_after_ir(input_img,args.model)
+    output = upscale_after_ir(input_img,args.model)
     output.save(args.output)
     logging.info("Upscale image saved as {}".format(args.output))

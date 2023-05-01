@@ -1,6 +1,6 @@
 import argparse
 import os
-from commands import available_model_list, upscale_cli, upscale_before_ir_cli, upscale_after_ir_cli
+from .commands import available_model_list, upscale_cli, upscale_before_ir_cli, upscale_after_ir_cli
 
 def cli():
     parser = argparse.ArgumentParser(description="HAKUIR")
