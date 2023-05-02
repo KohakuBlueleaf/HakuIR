@@ -28,6 +28,7 @@ def available_model_list(args):
         if model in model_list:
             available_models.append(model)
     print(available_models)
+    return available_models
 
 
 def upscale(input_image: Image, resample: Image.Resampling):
