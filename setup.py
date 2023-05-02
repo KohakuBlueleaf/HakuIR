@@ -15,8 +15,8 @@ setup(
         'toml'
     ],
     entry_points={
-    'console_scripts': [
-        'hakuir = hakuir.cli:cli'
-    ]
-  }
+        'console_scripts': [
+            'hakuir = hakuir.cli:cli'
+        ]
+    }
 )
