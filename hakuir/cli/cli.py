@@ -1,5 +1,5 @@
 import argparse
-from .commands import available_model_list, \
+from .commands import available_model_list, download_models, \
     upscale_cli, restoration_cli, upscale_before_ir_cli, upscale_after_ir_cli
 
 
@@ -9,7 +9,17 @@ def cli():
     subparsers = parser.add_subparsers(metavar='Command')
     modelsCommand = subparsers.add_parser(
         'models', help='Output model list')
+    modelsCommand.add_argument(
+        '-a', '--available', action='store_true',
+        help='Output available model list')
     modelsCommand.set_defaults(handle=available_model_list)
+
+    downloadCommand = subparsers.add_parser(
+        'download', help='Download model')
+    downloadCommand.add_argument(
+        '-m', '--model', type=str, required=True,
+        help='Model name')
+    downloadCommand.set_defaults(handle=download_models)
 
     upscaleCommand = subparsers.add_parser(
         'upscale', help='Just upscale')

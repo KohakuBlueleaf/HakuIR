@@ -2,14 +2,30 @@ import sys
 import os
 import logging
 from PIL import Image
+import urllib.request
 import time
 
 sys.path.append('..')
 
 logging.basicConfig(level=logging.INFO)
 
+downloadable_model_list = {
+    'SCUNet-GAN': 'scunet_color_real_gan',
+    'SCUNet-PSNR': 'scunet_color_real_psnr',
+}
+
 
 def available_model_list(args):
+    if args.available:
+        logging.info('Available models:')
+        for model in downloadable_model_list:
+            logging.info(model)
+        return downloadable_model_list
+    else:
+        return local_model_list(args)
+
+
+def local_model_list(args):
     folder = './models'
     model_list = []
     config_list = []
@@ -27,8 +43,23 @@ def available_model_list(args):
     for model in config_list:
         if model in model_list:
             available_models.append(model)
-    print(available_models)
+    logging.info(available_models)
     return available_models
+
+
+def download_models(args):
+    model_dir = './models'
+    model_name = args.model + '.pth'
+    if os.path.exists(os.path.join(model_dir, model_name)):
+        logging.info('Model {} already exists'.format(model_name))
+        return
+    os.makedirs(model_dir, exist_ok=True)
+    url = 'https://github.com/cszn/KAIR/releases/download/v1.0/{}'.format(
+        downloadable_model_list[args.model] + '.pth'
+    )
+    logging.info('Downloading {}...'.format(model_name))
+    urllib.request.urlretrieve(url, os.path.join(model_dir, model_name))
+    logging.info('Downloaded!')
 
 
 def upscale(input_image: Image, resample: Image.Resampling):
@@ -70,6 +101,7 @@ def check_path(input, output):
             if os.path.isfile(path):
                 input_list.append(path)
                 if output == '' or output is None:
+                    logging.debug('Output is missed,use default')
                     default_out = os.path.splitext(path)[0] + '_upscaled.png'
                     output_list.append(default_out)
                 elif os.path.isdir(output):
@@ -77,6 +109,7 @@ def check_path(input, output):
     else:
         input_list.append(input)
         if output == '' or output is None:
+            logging.debug('Output is missed,use default')
             output_list.append(os.path.splitext(input)[0] + '_upscaled.png')
         elif os.path.isdir(output):
             output_list.append(os.path.join(output, os.path.basename(input)))
