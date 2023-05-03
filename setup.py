@@ -16,7 +16,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'hakuir = hakuir.cli:cli'
+            'hakuir = hakuir.console:console'
         ]
     }
 )
