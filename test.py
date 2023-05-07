@@ -1,7 +1,6 @@
-import env
+import hakuir.env
 from PIL import Image
-from image_restoration import ImageRestoration
-
+from hakuir.image_restoration import ImageRestoration
 
 if __name__ == '__main__':
     model = ImageRestoration()

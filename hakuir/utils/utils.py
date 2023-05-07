@@ -9,6 +9,7 @@ from einops import rearrange
 
 def get_obj_from_str(string, reload=False):
     module, cls = string.rsplit(".", 1)
+    module = 'hakuir.' + module
     if reload:
         module_imp = importlib.import_module(module)
         importlib.reload(module_imp)
