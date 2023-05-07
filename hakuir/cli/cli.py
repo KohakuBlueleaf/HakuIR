@@ -1,10 +1,10 @@
 import argparse
 from .commands import available_model_list, download_models, \
-    upscale_console, restoration_console, \
-    upscale_before_ir_console, upscale_after_ir_console
+    upscale_cli, restoration_cli, \
+    upscale_before_ir_cli, upscale_after_ir_cli
 
 
-def console():
+def cli():
     parser = argparse.ArgumentParser(description='HAKUIR')
 
     subparsers = parser.add_subparsers(metavar='Command')
@@ -33,7 +33,7 @@ def console():
     upscale_command.add_argument(
         '-o', '--output', type=str,
         help='output image path')
-    upscale_command.set_defaults(handle=upscale_console)
+    upscale_command.set_defaults(handle=upscale_cli)
 
     restoration_command = subparsers.add_parser(
         'restoration', help='Just restoration')
@@ -46,7 +46,7 @@ def console():
     restoration_command.add_argument(
         '-o', '--output', type=str,
         help='output image path')
-    restoration_command.set_defaults(handle=restoration_console)
+    restoration_command.set_defaults(handle=restoration_cli)
 
     upscale_before_ir_command = subparsers.add_parser(
         'upscale-before-ir', help='Upscale before restoration')
@@ -59,7 +59,7 @@ def console():
     upscale_before_ir_command.add_argument(
         '-o', '--output', type=str,
         help='output image path')
-    upscale_before_ir_command.set_defaults(handle=upscale_before_ir_console)
+    upscale_before_ir_command.set_defaults(handle=upscale_before_ir_cli)
 
     upscale_after_ir_command = subparsers.add_parser(
         'upscale-after-ir', help='Upscale after restoration')
@@ -72,7 +72,7 @@ def console():
     upscale_after_ir_command.add_argument(
         '-o', '--output', type=str,
         help='output image path')
-    upscale_after_ir_command.set_defaults(handle=upscale_after_ir_console)
+    upscale_after_ir_command.set_defaults(handle=upscale_after_ir_cli)
 
     args = parser.parse_args()
 
@@ -83,4 +83,4 @@ def console():
 
 
 if __name__ == '__main__':
-    console()
+    cli()

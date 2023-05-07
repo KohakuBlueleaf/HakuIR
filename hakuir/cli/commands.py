@@ -116,7 +116,7 @@ def check_path(input, output):
     return input_list, output_list
 
 
-def upscale_console(args):
+def upscale_cli(args):
     input_list, output_list = check_path(args.input, args.output)
 
     logging.info('WorkList: Start')
@@ -136,7 +136,7 @@ def upscale_console(args):
     logging.info('WorkList: Done in {}s'.format(time_cost))
 
 
-def restoration_console(args):
+def restoration_cli(args):
     input_list, output_list = check_path(args.input, args.output)
 
     logging.info('Prepare: Load Restoration Model')
@@ -161,7 +161,7 @@ def restoration_console(args):
     logging.info('WorkList: Done in {}s'.format(time_cost))
 
 
-def upscale_before_ir_console(args):
+def upscale_before_ir_cli(args):
     input_list, output_list = check_path(args.input, args.output)
 
     logging.info('Prepare: Load Restoration Model')
@@ -186,7 +186,7 @@ def upscale_before_ir_console(args):
     logging.info('WorkList: Done in {}s'.format(time_cost))
 
 
-def upscale_after_ir_console(args):
+def upscale_after_ir_cli(args):
     input_list, output_list = check_path(args.input, args.output)
 
     logging.info('Prepare: Load Restoration Model')
