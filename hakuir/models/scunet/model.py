@@ -7,6 +7,8 @@ from einops import rearrange
 from einops.layers.torch import Rearrange, Reduce
 from timm.models.layers import trunc_normal_, DropPath
 
+from ..base import HakuIRModel
+
 
 class WMSA(nn.Module):
     """ Self-attention module in Swin Transformer
@@ -145,10 +147,10 @@ class ConvTransBlock(nn.Module):
         self.conv1_2 = nn.Conv2d(self.conv_dim+self.trans_dim, self.conv_dim+self.trans_dim, 1, 1, 0, bias=True)
 
         self.conv_block = nn.Sequential(
-                nn.Conv2d(self.conv_dim, self.conv_dim, 3, 1, 1, bias=False),
-                nn.ReLU(True),
-                nn.Conv2d(self.conv_dim, self.conv_dim, 3, 1, 1, bias=False)
-                )
+            nn.Conv2d(self.conv_dim, self.conv_dim, 3, 1, 1, bias=False),
+            nn.ReLU(True),
+            nn.Conv2d(self.conv_dim, self.conv_dim, 3, 1, 1, bias=False)
+        )
 
     def forward(self, x):
         conv_x, trans_x = torch.split(self.conv1_1(x), (self.conv_dim, self.trans_dim), dim=1)
@@ -162,7 +164,7 @@ class ConvTransBlock(nn.Module):
         return x
 
 
-class SCUNet(nn.Module):
+class SCUNet(HakuIRModel):
 
     def __init__(self, in_nc=3, config=[2,2,2,2,2,2,2], dim=64, drop_path_rate=0.0, input_resolution=256):
         super(SCUNet, self).__init__()

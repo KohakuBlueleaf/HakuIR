@@ -23,10 +23,11 @@ class ImageRestoration:
         if 'params' in state_dict:
             state_dict = state_dict['params']
 
-        net: nn.Module = instantiate(config['class'])(**config['configs'])
+        net: nn.Module = instantiate(f"models.{config['class']}")(**config['configs'])
         net.load_state_dict(state_dict)
         net = net.cuda().half()
         self.model = net
+        self.tile_size = config.get('img_size', self.tile_size)
 
     @torch.no_grad()
     def _restoration(self, img: torch.Tensor, batch_size=4):
@@ -37,8 +38,7 @@ class ImageRestoration:
         stride = tile - self.tile_overlap
         h_idx_list = list(range(0, h - tile, stride)) + [h - tile]
         w_idx_list = list(range(0, w - tile, stride)) + [w - tile]
-        E = torch.zeros(b, c, h, w, dtype=img.dtype,
-                        device=img.device).type_as(img)
+        E = torch.zeros(b, c, h, w, dtype=img.dtype, device=img.device).type_as(img)
         W = torch.zeros_like(E, dtype=img.dtype, device=img.device)
 
         all_patch = []
@@ -50,8 +50,7 @@ class ImageRestoration:
         ) as pbar:
             for h_idx in h_idx_list:
                 for w_idx in w_idx_list:
-                    in_patch = img[..., h_idx: h_idx +
-                                   tile, w_idx: w_idx + tile]
+                    in_patch = img[..., h_idx: h_idx + tile, w_idx: w_idx + tile]
                     all_patch.append(in_patch)
                     all_idx.append((h_idx, w_idx))
             for i in range(0, len(all_patch), batch_size):
@@ -83,8 +82,8 @@ class ImageRestoration:
         dtype=torch.float16
     ) -> Image.Image:
         img = ToTensor()(img)
-        img = img.unsqueeze(0).cuda().half()
-        with torch.autocast(device, dtype):
+        img = img.unsqueeze(0).cuda()
+        with torch.autocast(device):
             output: torch.Tensor = self._restoration(img, batch_size)
         output = output.squeeze(0).permute(1, 2, 0).float().cpu()
         output = torch.clamp(output, 0, 1)

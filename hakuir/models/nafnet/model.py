@@ -1,10 +1,14 @@
 # ------------------------------------------------------------------------
 # Copyright (c) 2022 megvii-model. All Rights Reserved.
 # ------------------------------------------------------------------------
+from functools import partial
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from einops import reduce
+
+from ..base import HakuIRModel
 
 
 class AvgPool2d(nn.Module):
@@ -206,7 +210,7 @@ class NAFBlock(nn.Module):
         return y + x * self.gamma
 
 
-class NAFNet(nn.Module):
+class NAFNet(HakuIRModel):
     def __init__(
         self, 
         img_channel=3, 
