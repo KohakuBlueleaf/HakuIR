@@ -2,6 +2,7 @@
 # Copyright (c) 2022 megvii-model. All Rights Reserved.
 # ------------------------------------------------------------------------
 from functools import partial
+from collections import OrderedDict, abc as container_abcs
 
 import torch
 import torch.nn as nn
@@ -13,16 +14,41 @@ from ..base import HakuIRModel
 
 class WSConv2d(nn.Conv2d):
     """https://arxiv.org/abs/1903.10520"""
-    def forward(self, x):
-        eps = 1e-3 if x.dtype == torch.float16 else 1e-5
-        
+    def state_dict(self, *args, destination=None, prefix='', keep_vars=False):
+        # TODO: Remove `args` and the parsing logic when BC allows.
+        if len(args) > 0:
+            if destination is None:
+                destination = args[0]
+            if len(args) > 1 and prefix == '':
+                prefix = args[1]
+            if len(args) > 2 and keep_vars is False:
+                keep_vars = args[2]
+            # DeprecationWarning is ignored by default
+
+        if destination is None:
+            destination = OrderedDict()
+            destination._metadata = OrderedDict()
+
+        local_metadata = dict(version=self._version)
+        if hasattr(destination, "_metadata"):
+            destination._metadata[prefix[:-1]] = local_metadata
+
+        destination[f'{prefix}weight'] = self._get_weight()
+        if self.bias is not None:
+            destination[f'{prefix}bias'] = self.bias
+        return destination
+
+    def _get_weight(self, dtype=None):
         weight = self.weight
+        eps = 1e-3 if (dtype or weight.dtype) == torch.float16 else 1e-5
         mean = reduce(weight, 'o ... -> o 1 1 1', 'mean')
         var = reduce(weight, 'o ... -> o 1 1 1', partial(torch.var, unbiased=False))
         normalized_weight = (weight - mean) * (var + eps).rsqrt()
-        
+        return normalized_weight
+
+    def forward(self, x):
         return F.conv2d(
-            x, normalized_weight, self.bias, 
+            x, self._get_weight(x.dtype), self.bias, 
             self.stride, self.padding, self.dilation, self.groups
         )
 
