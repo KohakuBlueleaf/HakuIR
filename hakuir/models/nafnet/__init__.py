@@ -1,1 +1,1 @@
-from .model import NAFNet, NAFNetLocal
+from .model import NAFNet
