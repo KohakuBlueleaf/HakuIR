@@ -13,6 +13,13 @@ https://github.com/cszn/KAIR/releases
 And them rename them to the name of SCUNet-GAN or SCUNet-PSNR.
 
 
+RGT:
+download from official repo:
+https://github.com/zhengchen1999/RGT?tab=readme-ov-file#-models
+(Method: RGT, RGT-S also but you need to check the config by yourself)
+No need to rename.
+
+
 Others:
 If you have other models that want to use in this script,
 make sure you have the code of that model (you can refer to the nafnet/scunet folder)
