@@ -1,15 +1,15 @@
-from hakuir.utils import instantiate
-from torchvision.transforms import ToTensor
-import torch.nn as nn
-import torch
-from PIL import Image
-import numpy as np
-from tqdm import tqdm
-import toml
 import math
-import os
+import toml
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:256"
+import torch
+import torch.nn as nn
+import numpy as np
+from torchvision.transforms import ToTensor
+from tqdm import tqdm
+from PIL import Image
+
+from hakuir.utils import instantiate
+from hakuir.utils.img_process import match_color_pil
 
 
 class ImageRestoration:
@@ -26,7 +26,7 @@ class ImageRestoration:
 
         net: nn.Module = instantiate(f"models.{config['class']}")(**config["configs"])
         net.load_state_dict(state_dict)
-        net = net.cuda().half()
+        net = net.cuda()
         self.model = net
         self.tile_size = config.get("img_size", self.tile_size)
 
@@ -48,6 +48,7 @@ class ImageRestoration:
         with tqdm(
             total=math.ceil(len(h_idx_list) * len(w_idx_list) / batch_size),
             desc="IR tiles",
+            leave=False,
         ) as pbar:
             for h_idx in h_idx_list:
                 for w_idx in w_idx_list:
@@ -55,14 +56,19 @@ class ImageRestoration:
                     all_patch.append(in_patch)
                     all_idx.append((h_idx, w_idx))
             for i in range(0, len(all_patch), batch_size):
-                out_patch = self.model(torch.cat(all_patch[i : i + batch_size]))
+                current_patch = torch.cat(all_patch[i : i + batch_size])
+                out_patch = self.model(current_patch)
                 for idx, (h_idx, w_idx) in enumerate(all_idx[i : i + batch_size]):
                     all_patch[i + idx] = (h_idx, w_idx, out_patch[idx])
                 pbar.update(1)
                 mem_usage = torch.cuda.memory_allocated() / 1e6
                 pbar.set_postfix({"mem": f"{mem_usage:.1f}MB"})
 
-        for h_idx, w_idx, out_patch in tqdm(all_patch, desc="Rebuild tiles"):
+        for h_idx, w_idx, out_patch in tqdm(
+            all_patch,
+            desc="Rebuild tiles",
+            leave=False,
+        ):
             out_patch_mask = torch.ones_like(out_patch)
             E[..., h_idx : (h_idx + tile), w_idx : (w_idx + tile)].add_(out_patch)
             W[..., h_idx : (h_idx + tile), w_idx : (w_idx + tile)].add_(out_patch_mask)
@@ -74,14 +80,15 @@ class ImageRestoration:
     def restoration(
         self, img: Image.Image, batch_size=4, device="cuda", dtype=torch.float16
     ) -> Image.Image:
-        img = ToTensor()(img)
-        img = img.unsqueeze(0).cuda()
-        with torch.autocast(device):
-            output: torch.Tensor = self._restoration(img, batch_size)
+        img_tensor = ToTensor()(img)
+        img_tensor = img_tensor.unsqueeze(0).cuda()
+        with torch.autocast(device, dtype):
+            output: torch.Tensor = self._restoration(img_tensor, batch_size)
         output = output.squeeze(0).permute(1, 2, 0).float().cpu()
         output = torch.clamp(output, 0, 1)
         output = (output * 255).numpy().astype(np.uint8)
         output: Image.Image = Image.fromarray(output)
+        output = match_color_pil(output, img)
         return output
 
     def upscale_before_ir(
