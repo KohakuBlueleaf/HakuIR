@@ -1,0 +1,16 @@
+---
+
+**Source Modification Notice:**
+
+This code has been modified from its original version.
+
+- **Original Source**: [NAFNet](https://github.com/cszn/SCUNet/blob/main/models/network_scunet.py)
+- **License**: [MIT License](https://opensource.org/license/mit)
+
+**Copyright Notice**:
+
+© 2022 megvii-model
+
+All rights reserved under MIT License.
+
+---

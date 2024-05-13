@@ -1,3 +1,8 @@
+"""
+Modified from https://github.com/cszn/SCUNet/blob/main/models/network_scunet.py
+Check the NOTICE file under same folder for more information.
+"""
+
 import math
 import torch
 import torch.nn as nn

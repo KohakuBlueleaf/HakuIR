@@ -1,22 +1,13 @@
-# ------------------------------------------------------------------------
-# Copyright (c) 2022 megvii-model. All Rights Reserved.
-# ------------------------------------------------------------------------
+"""
+Modified from https://github.com/cszn/SCUNet/blob/main/models/network_scunet.py
+Check the NOTICE file under same folder for more information.
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from ..base import HakuIRModel
-
-
-"""
-ref. 
-@article{chu2021tlsc,
-  title={Revisiting Global Statistics Aggregation for Improving Image Restoration},
-  author={Chu, Xiaojie and Chen, Liangyu and and Chen, Chengpeng and Lu, Xin},
-  journal={arXiv preprint arXiv:2112.04491},
-  year={2021}
-}
-"""
 
 
 class LayerNormFunction(torch.autograd.Function):

@@ -1,3 +1,8 @@
+"""
+Modified from https://github.com/zhengchen1999/RGT/blob/main/basicsr/archs/rgt_arch.py
+Check the NOTICE file under same folder for more information.
+"""
+
 import torch
 import torch.nn as nn
 import torch.utils.checkpoint as checkpoint

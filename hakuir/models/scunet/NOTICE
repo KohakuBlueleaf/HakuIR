@@ -1,0 +1,19 @@
+---
+
+**Source Modification Notice:**
+
+This code has been modified from its original version.
+
+- **Original Source**: [SCUNet](https://github.com/cszn/SCUNet/blob/main/models/network_scunet.py)
+- **License**: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
+**Copyright Notice**:
+
+© 2022 Kai Zhang
+
+- **Email**: cskaizhang@gmail.com
+- **Website**: [https://cszn.github.io/](https://cszn.github.io/)
+
+All rights reserved under Apache License 2.0.
+
+---
