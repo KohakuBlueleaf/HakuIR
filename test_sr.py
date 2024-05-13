@@ -26,5 +26,5 @@ if __name__ == "__main__":
     for i in range(2, 5):
         model = ImageSuperRes()
         model.load_model(f"RGT_x{i}")
-        output = model.upscale(test_img, SCALE, 8, dtype=torch.bfloat16)
+        output = model.upscale(test_img, SCALE, 8, dtype=torch.float32)
         output.save(f"./demo/RGT_x{i}-upscale-4x.png")

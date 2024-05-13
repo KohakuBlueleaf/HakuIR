@@ -32,11 +32,11 @@ if __name__ == "__main__":
     test_upscale.save("./demo/lanczos.png")
 
     output2 = test_img
-    output2 = model2.upscale_after_ir(test_img, 1, 16)
+    output2 = model2.upscale_after_ir(test_img, 1, 16, dtype=torch.float32)
     output2.save("./demo/scunet-begin.png")
 
-    output = model.upscale_after_ir(output2, SCALE, 8)
+    output = model.upscale_after_ir(output2, SCALE, 8, dtype=torch.float32)
     output.save("./demo/ir-begin.png")
 
-    output = model.upscale_before_ir(output2, SCALE, 8)
+    output = model.upscale_before_ir(output2, SCALE, 8, dtype=torch.float32)
     output.save("./demo/ir-end.png")
