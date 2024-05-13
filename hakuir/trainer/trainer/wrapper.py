@@ -19,15 +19,15 @@ class IRTrainer(pl.LightningModule):
         learning_rate: float = 1e-4,
         optimizer: type = optim.AdamW,
         optimizer_config: dict[str, Any] = {
-            'weight_decay': 1e-2,
-            'betas': (0.9, 0.999),
+            "weight_decay": 1e-2,
+            "betas": (0.9, 0.999),
         },
         lr_scheduler: type = optim.lr_scheduler.CosineAnnealingLR,
         lr_scheduler_config: dict[str, Any] = {
-            'T_max': 300_000,
-            'eta_min': 1e-7,
+            "T_max": 300_000,
+            "eta_min": 1e-7,
         },
         warmup_steps: int = 0,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
