@@ -110,7 +110,9 @@ class ImageSuperRes:
     ) -> Image.Image:
         target_size = (int(img.size[0] * scale), int(img.size[1] * scale))
         upscale = img
-        for _ in trange(math.ceil(math.log(scale, self.scale)), desc="Upscale Pass"):
+        for _ in trange(
+            math.ceil(math.log(scale, self.scale)), desc="Upscale Pass", leave=False
+        ):
             upscale = self.restoration(upscale, batch_size, device, dtype)
 
         upscale = upscale.resize(target_size, resample=Image.BICUBIC)
