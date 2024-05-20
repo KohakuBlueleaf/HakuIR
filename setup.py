@@ -1,9 +1,10 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+
 
 setup(
     name="hakuir",
-    packages=["hakuir"],
-    version="0.0.2",
+    packages=find_packages(),
+    version="0.0.5",
     install_requires=[
         "torch",
         "torchvision",

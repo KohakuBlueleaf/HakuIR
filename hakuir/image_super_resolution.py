@@ -8,8 +8,8 @@ from torchvision.transforms import ToTensor
 from tqdm import tqdm, trange
 from PIL import Image
 
-from hakuir.utils import instantiate
-from hakuir.utils.img_process import match_color_pil
+from .utils import instantiate
+from .utils.img_process import match_color_pil
 
 
 class ImageSuperRes:
